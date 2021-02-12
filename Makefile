@@ -1,6 +1,6 @@
 NAME = cub3D
 
-SRC = cub3d.c
+SRC = cub3d.c utils.c
 
 OBJ = ${SRC:.c=.o}
 
