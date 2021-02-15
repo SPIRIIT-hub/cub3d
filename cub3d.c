@@ -6,7 +6,7 @@
 /*   By: bmoulin <bmoulin@42lyon.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/09 11:41:34 by bmoulin           #+#    #+#             */
-/*   Updated: 2021/02/12 09:14:30 by bmoulin          ###   ########lyon.fr   */
+/*   Updated: 2021/02/15 14:32:39 by bmoulin          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,8 @@ double px, py, pdx, pdy, pa;
 int		map[64] =
 {
 	1,1,1,1,1,1,1,1,
-	1,0,0,0,0,0,0,1,
-	1,0,0,0,0,0,0,1,
+	1,0,0,1,0,0,0,1,
+	1,0,0,1,0,0,0,1,
 	1,0,0,1,1,1,0,1,
 	1,0,0,0,0,0,0,1,
 	1,0,0,1,1,0,0,1,
@@ -60,6 +60,18 @@ int             loop_hook(t_vars *vars)
 	return (0);
 }
 
+void	drawlinetowall(t_vars *vars) // changer pdx et pdy pour s'arreter a un mur.
+{
+	double tmpx;
+	double tmpy;
+	tmpx = 0.0001;
+	tmpy = 0.0001;
+	while (tmpx)
+	// if (pa > PI) {printf("up\n");}
+	// else if (pa < PI) {printf("down\n");}
+	// else {printf("cote\n");}
+}
+
 void		playerposition(t_vars *vars)
 {
 	int		i;
@@ -73,6 +85,7 @@ void		playerposition(t_vars *vars)
 			my_mlx_pixel_put(vars, i - 5, j- 5, 0xFFFFF);
 		j = py;
 	}
+	drawlinetowall(vars);
 	drawline(px, py, px + pdx * 50, py + pdy * 50, vars);
 }
 
@@ -120,47 +133,45 @@ int             key_hook(int keycode, t_vars *vars)
 
 void		putsquareWall(t_vars *vars, int x, int y)
 {
-	int		size = 50;
 	int		tmpx;
 	int		tmpy;
-	x *= 	size;
-	y *= 	size;
+	x *= 	SIZE;
+	y *= 	SIZE;
 	tmpx = x;
 	tmpy = y;
-	while (x++ <= tmpx + size)
+	while (x++ <= tmpx + SIZE)
 	{
-		while (y++ <= tmpy + size)
+		while (y++ <= tmpy + SIZE)
 			my_mlx_pixel_put(vars, x, y, 0xFF0000);
 		y = tmpy;
 	}
 	y = tmpy;
 	x = tmpx;
-	while (x++ <= tmpx + size)
+	while (x++ <= tmpx + SIZE)
 		my_mlx_pixel_put(vars, x, y, 0x00000);
-	while (y++ <= tmpy + size)
+	while (y++ <= tmpy + SIZE)
 		my_mlx_pixel_put(vars, tmpx, y, 0x00000);
 }
 
 void		putsquareVoid(t_vars *vars, int x, int y)
 {
-	int		size = 50;
 	int		tmpx;
 	int		tmpy;
-	x *= 	size;
-	y *= 	size;
+	x *= 	SIZE;
+	y *= 	SIZE;
 	tmpx = x;
 	tmpy = y;
-	while (x++ <= tmpx + size)
+	while (x++ <= tmpx + SIZE)
 	{
-		while (y++ <= tmpy + size)
+		while (y++ <= tmpy + SIZE)
 			my_mlx_pixel_put(vars, x, y, 0xFFFFFF);
 		y = tmpy;
 	}
 	y = tmpy;
 	x = tmpx;
-	while (x++ <= tmpx + size)
+	while (x++ <= tmpx + SIZE)
 		my_mlx_pixel_put(vars, x, y, 0x00000);
-	while (y++ <= tmpy + size)
+	while (y++ <= tmpy + SIZE)
 		my_mlx_pixel_put(vars, tmpx, y, 0x00000);
 }
 
@@ -169,7 +180,6 @@ void		putWallInImage(t_vars *vars)
 	int x,y,xo,yo;
 	int tmpx;
 	int tmpy;
-	int		size = 50;
 	for (y=0;y<mapX;y++)
 	{
 		for(x=0;x<mapX;x++)
@@ -184,14 +194,14 @@ void		putWallInImage(t_vars *vars)
 	}
 	y--;
 	x--;
-	tmpy = y * size;
-	tmpx = x * size;
+	tmpy = y * SIZE;
+	tmpx = x * SIZE;
 	x = 0;
-	while (x++ <= tmpx + size)
-		my_mlx_pixel_put(vars, x, tmpy + size + 1, 0x00000);
+	while (x++ <= tmpx + SIZE)
+		my_mlx_pixel_put(vars, x, tmpy + SIZE + 1, 0x00000);
 	y = 0;
-	while (y++ <= tmpy + size)
-		my_mlx_pixel_put(vars, tmpx + size + 1, y, 0x00000);
+	while (y++ <= tmpy + SIZE)
+		my_mlx_pixel_put(vars, tmpx + SIZE + 1, y, 0x00000);
 }
 
 void		ft_putbackground(t_vars *vars)

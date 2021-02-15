@@ -6,7 +6,7 @@
 /*   By: bmoulin <bmoulin@42lyon.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/11 15:39:48 by bmoulin           #+#    #+#             */
-/*   Updated: 2021/02/12 08:25:50 by bmoulin          ###   ########lyon.fr   */
+/*   Updated: 2021/02/15 14:26:41 by bmoulin          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 #define KEY_A 0
 #define KEY_W 13
 #define PI 3.14159265359
+#define SIZE 50
 
 typedef struct  s_vars {
         void    *mlx;
