@@ -6,7 +6,7 @@
 /*   By: bmoulin <bmoulin@42lyon.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/11 15:39:48 by bmoulin           #+#    #+#             */
-/*   Updated: 2021/02/15 14:26:41 by bmoulin          ###   ########lyon.fr   */
+/*   Updated: 2021/02/16 17:41:24 by bmoulin          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,10 @@
 #define KEY_A 0
 #define KEY_W 13
 #define PI 3.14159265359
-#define SIZE 50
+#define MINIMAP_HEIGHT 512
+#define MINIMAP_WIDTH 512
+// #define SIZE 50
+#define SIZE (int)(512 / 8)
 
 typedef struct  s_vars {
         void    *mlx;
@@ -46,5 +49,6 @@ void			putsquareVoid(t_vars *vars, int x, int y);
 void			putWallInImage(t_vars *vars);
 void			ft_putbackground(t_vars *vars);
 void			drawline(int x0, int y0, int x1, int y1, t_vars *vars);
+int				ft_retindex(int px, int py, int mapX);
 
 #endif
