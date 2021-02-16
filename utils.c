@@ -6,7 +6,7 @@
 /*   By: bmoulin <bmoulin@42lyon.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/12 07:47:34 by bmoulin           #+#    #+#             */
-/*   Updated: 2021/02/16 17:41:53 by bmoulin          ###   ########lyon.fr   */
+/*   Updated: 2021/02/16 17:56:47 by bmoulin          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,18 +29,19 @@ void drawline(int x0, int y0, int x1, int y1, t_vars *vars)
 
 int		ft_retindex(int px, int py, int mapX)
 {
-	int tmpx;
-	int tmpy;
+	int	   tmpx;
+	int	   tmpy;
 	int	   place;
 
 	// tmpx = (px / SIZE);
 	// tmpy = (py / SIZE) + 1;
 	tmpx = (px / SIZE);
-	if (!(px % SIZE == px) && (px % SIZE > 0))
-		tmpx++;
+	// if (!(px % SIZE == px) && (px % SIZE > 0))
+	// 	tmpx++;
 	tmpy = (py / SIZE);
-	if (!(py % SIZE == py) && (py % SIZE > 0))
-		tmpy++;
+	// if (!(py % SIZE == py) && (py % SIZE > 0))
+	// 	tmpy++;
+	tmpy++;
 	place = floor((int)((tmpy * mapX + tmpx) - mapX));
 	if (place < 0)
 		place = floor((int)(tmpy * mapX + tmpx));

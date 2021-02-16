@@ -6,7 +6,7 @@
 /*   By: bmoulin <bmoulin@42lyon.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/09 11:41:34 by bmoulin           #+#    #+#             */
-/*   Updated: 2021/02/16 17:42:06 by bmoulin          ###   ########lyon.fr   */
+/*   Updated: 2021/02/16 17:55:12 by bmoulin          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -292,12 +292,11 @@ int             main(void)
 	pa = 0;
 	pdx = cos(pa);
 	pdy = sin(pa);
-	
+
 	mlx_hook(vars.win, 2, 1L<<0, key_hook, &vars);
 	mlx_loop_hook(vars.mlx, loop_hook, &vars);
 	vars.img = mlx_new_image(vars.mlx, 1920, 1080);
-    vars.addr = mlx_get_data_addr(vars.img, &vars.bits_per_pixel, &vars.line_length,
-                                 &vars.endian);
+    vars.addr = mlx_get_data_addr(vars.img, &vars.bits_per_pixel, &vars.line_length, &vars.endian);
 	ft_putbackground(&vars);
 	playerposition(&vars);
     mlx_put_image_to_window(vars.mlx, vars.win, vars.img, 0, 0);
