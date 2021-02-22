@@ -6,7 +6,7 @@
 /*   By: bmoulin <bmoulin@42lyon.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/11 15:39:48 by bmoulin           #+#    #+#             */
-/*   Updated: 2021/02/16 17:41:24 by bmoulin          ###   ########lyon.fr   */
+/*   Updated: 2021/02/18 11:18:13 by bmoulin          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,10 +22,24 @@
 #define KEY_A 0
 #define KEY_W 13
 #define PI 3.14159265359
-#define MINIMAP_HEIGHT 512
-#define MINIMAP_WIDTH 512
+#define MINIMAP_HEIGHT (int)512
+#define MINIMAP_WIDTH (int)512
+#define MAP_HEIGHT (int)512
+#define MAP_WIDTH (int)1024
 // #define SIZE 50
-#define SIZE (int)(512 / 8)
+#define SIZE (int)(MINIMAP_HEIGHT / 8)
+
+typedef struct  s_cub {
+        void    *mlx;
+        void    *win;
+		int		x;
+		int		y;
+		void    *img;
+		char    *addr;
+		int     bits_per_pixel;
+		int     line_length;
+		int     endian;
+}               t_cub;
 
 typedef struct  s_vars {
         void    *mlx;
@@ -37,6 +51,7 @@ typedef struct  s_vars {
 		int     bits_per_pixel;
 		int     line_length;
 		int     endian;
+		t_cub	cub;
 }               t_vars;
 
 int             close(int keycode, t_vars *vars);
@@ -49,6 +64,8 @@ void			putsquareVoid(t_vars *vars, int x, int y);
 void			putWallInImage(t_vars *vars);
 void			ft_putbackground(t_vars *vars);
 void			drawline(int x0, int y0, int x1, int y1, t_vars *vars);
+double			drawray(int x0, int y0, int x1, int y1, t_vars *vars);
 int				ft_retindex(int px, int py, int mapX);
+void			ft_putbackground2(t_cub *vars, int color);
 
 #endif

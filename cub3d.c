@@ -6,14 +6,15 @@
 /*   By: bmoulin <bmoulin@42lyon.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/09 11:41:34 by bmoulin           #+#    #+#             */
-/*   Updated: 2021/02/16 17:55:12 by bmoulin          ###   ########lyon.fr   */
+/*   Updated: 2021/02/19 11:45:32 by bmoulin          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
 int mapX=8,mapY=8,mapS=64;
-double px, py, pdx, pdy, pa;
+int	cx = 0, cy = 0;
+double px, py, pdx, pdy, rdx, rdy, pa;
 
 int		map[64] =
 {
@@ -41,11 +42,19 @@ int		map[64] =
 
 int             close(int keycode, t_vars *vars)
 {
+	mlx_destroy_window(vars->cub.mlx, vars->cub.win);
     mlx_destroy_window(vars->mlx, vars->win);
 	exit(0);
 }
 
 void            my_mlx_pixel_put(t_vars *data, int x, int y, int color)
+{
+    char    *dst;
+    dst = data->addr + (y * data->line_length + x * (data->bits_per_pixel / 8));
+    *(unsigned int*)dst = color;
+}
+
+void            my_mlx_pixel_put2(t_cub *data, int x, int y, int color)
 {
     char    *dst;
     dst = data->addr + (y * data->line_length + x * (data->bits_per_pixel / 8));
@@ -58,14 +67,14 @@ int             loop_hook(t_vars *vars)
 	return (0);
 }
 
-
-void drawray(int x0, int y0, int x1, int y1, t_vars *vars)
+double drawray(int x0, int y0, int x1, int y1, t_vars *vars)
 {
   int dx =  abs (x1 - x0), sx = x0 < x1 ? 1 : -1;
   int dy = -abs (y1 - y0), sy = y0 < y1 ? 1 : -1; 
   int err = dx + dy, e2; /* error value e_xy */
   int	count = 0;
-	
+  double distance;
+
 	int index;
 	index = ft_retindex(x0, y0, mapX);
   while (!map[index]){  /* loop */
@@ -76,6 +85,8 @@ void drawray(int x0, int y0, int x1, int y1, t_vars *vars)
     if (e2 <= dx) { err += dx; y0 += sy; } /* e_xy+e_y < 0 */
 	index = ft_retindex(x0, y0, mapX);
   }
+	distance = sqrt((px-x0)*(px-x0) + (py-y0)*(py-y0));
+	return (distance);
 }
 
 void drawray2(int x0, int y0, int x1, int y1, t_vars *vars)
@@ -97,7 +108,43 @@ void drawray2(int x0, int y0, int x1, int y1, t_vars *vars)
   }
 }
 
-//drawline(px+2, py+2, px + pdx * 50, py + pdy * 50, vars);
+int color[4] = {(0xC7C7C7), (0x000010), (0xFFFFFF), (0x0F0F0F)};
+int colortab = 2;
+
+
+void	RayCaster(double distance, t_vars *vars)
+{
+	int loop_pixel = MAP_WIDTH;
+	int pixel_len = ceil(((MAP_HEIGHT/2)/distance) * SIZE);
+	int mid_pix_len = pixel_len / 2;
+	int i = 0;
+	int sky = ((MAP_HEIGHT - pixel_len) / 2) + 1;
+	int floor = sky;
+	// if (colortab >= 4)
+	// 	colortab = 0;
+	// ft_putbackground2(&vars->cub, color[0]);
+	// printf("pixel_len : %d\n", pixel_len);
+	cx = MAP_HEIGHT/2;
+	while (mid_pix_len--)
+	{
+		my_mlx_pixel_put2(&vars->cub, cy, cx--, 0xFF0000);
+	}
+	while (sky--)
+		my_mlx_pixel_put2(&vars->cub, cy, cx--, 0x0097FF); // sky
+	my_mlx_pixel_put2(&vars->cub, cy, 0, 0x0097FF);
+	mid_pix_len = pixel_len / 2;
+	cx = MAP_HEIGHT/2;
+	while (mid_pix_len--)
+	{
+		my_mlx_pixel_put2(&vars->cub, cy, cx++, 0xFF0000);
+	}
+	while (floor--)
+		my_mlx_pixel_put2(&vars->cub, cy, cx++, 0xFFFFF); // floor
+	cy++;
+	// if (cy >= MAP_WIDTH)
+	// 	cy = 0;
+	// mlx_put_image_to_window(vars->mlx, vars->cub.win, vars->cub.img, 0, 0);
+}
 
 void	drawlinetowall(t_vars *vars) // changer pdx et pdy pour s'arreter a un mur.
 {
@@ -107,42 +154,34 @@ void	drawlinetowall(t_vars *vars) // changer pdx et pdy pour s'arreter a un mur.
 	double local_py = py;
 	double local_pdx = pdx;
 	double local_pdy = pdy;
-	double count = 0;
+	double count = MAP_WIDTH/1000;
+	// double count = 0;
+	rdx = pdx;
+	rdy = pdy;
 
 	index = ft_retindex(px, py, mapX);
-	while (count <= 0.75)
+	while (count >= 0.001)
 	{
-		drawray(px, py, px + pdx * 50000, py + pdy * 50000, vars);
-		pdx = cos(pa + count);
-		pdy = sin(pa + count);
-		count += 0.01;
+		RayCaster(drawray(px, py, px + rdx * 50000, py + rdy * 50000, vars), vars);
+		// drawray(px, py, px + rdx * 50000, py + pdy * 50000, vars);
+		rdx = cos(pa + count);
+		rdy = sin(pa + count);
+		count -= 0.001;
 	}
-	count = 0;
-	while (count <= 0.75)
+	cx = 0;
+	count = MAP_WIDTH/1000;
+	// ft_putbackground2(&vars->cub, color[0]);
+	while (count >= 0.001)
 	{
-		drawray(px, py, px + pdx * 50000, py + pdy * 50000, vars);
-		pdx = cos(pa - count);
-		pdy = sin(pa - count);
-		count += 0.01;
+		// drawray(px, py, px + pdx * 50000, py + rdy * 50000, vars);
+		RayCaster(drawray(px, py, px + rdx * 50000, py + rdy * 50000, vars), vars);
+		rdx = cos(pa - count);
+		rdy = sin(pa - count);
+		count -= 0.001;
 	}
-	pdx = local_pdx;
-	pdy = local_pdy;
-	// drawray(px, py, px + pdx * 50000, py + pdy * 50000, vars);
-	if (pa > PI)
-	{
-		len_rayon = local_px - px;
-	}
-	else if (pa < PI)
-	{
-		len_rayon = (py - local_py);
-	}
-	else
-	{
-		if (px > py)
-			len_rayon = local_px - px;
-		else
-			len_rayon = local_py - py;
-	}
+	cy = 0;
+	printf("rdx : %f|rdy : %f|pa : %f|px : %f|py : %f\n", rdx, rdy, pa, px, py);
+	mlx_put_image_to_window(vars->mlx, vars->cub.win, vars->cub.img, 0, 0);
 }
 
 void		playerposition(t_vars *vars)
@@ -253,28 +292,37 @@ void		ft_putbackground(t_vars *vars)
 	int x = -1;
 	int y = -1;
 
-	while (++x <= 1024)
+	while (++x <= MINIMAP_HEIGHT)
 	{
-		while (++y <= 512)
+		while (++y <= MINIMAP_WIDTH)
 			my_mlx_pixel_put(vars, x, y, 0x00000000);
 		y = -1;
 	}
 	putWallInImage(vars);
 }
 
+void		ft_putbackground2(t_cub *vars, int color)
+{
+	int x = -1;
+	int y = -1;
 
-// void		init_raycaster(t_vars *vars)
-// {
-// 	t_vars	  cub;
+	while (++x <= MAP_WIDTH)
+	{
+		while (++y <= MAP_HEIGHT)
+			my_mlx_pixel_put2(vars, x, y, color);
+		y = -1;
+	}
+}
 
-// 	cub.win = mlx_new_window(vars->mlx, 1024, 512, "RayCaster");
-// 	mlx_hook(cub.win, 2, 1L<<0, key_hook, &cub);
-// 	mlx_loop_hook(vars->mlx, loop_hook, &cub);
-// 	cub.img = mlx_new_image(vars->mlx, 1920, 1080);
-// 	cub.addr = mlx_get_data_addr(cub.img, &cub.bits_per_pixel, &cub.line_length,
-//                                  &cub.endian);
-// 	// mlx_put_image_to_window(vars->mlx, vars.win, vars.img, 0, 0);
-// }
+void		init_raycaster(t_vars *vars)
+{
+	vars->cub.win = mlx_new_window(vars->mlx, MAP_WIDTH, MAP_HEIGHT, "RayCaster");
+	mlx_hook(vars->cub.win, 2, 1L<<0, key_hook, &vars->cub);
+	mlx_loop_hook(vars->mlx, loop_hook, vars);
+	vars->cub.img = mlx_new_image(vars->mlx, 1920, 1080);
+	vars->cub.addr = mlx_get_data_addr(vars->cub.img, &vars->cub.bits_per_pixel, &vars->cub.line_length,
+                                 &vars->cub.endian);
+}
 
 int             main(void)
 {
@@ -285,21 +333,21 @@ int             main(void)
     vars.mlx = mlx_init();
     vars.win = mlx_new_window(vars.mlx, MINIMAP_HEIGHT, MINIMAP_WIDTH, "Hello world!");
 
-	vars.x = 1;
-	vars.y = 2;
+	vars.x = 2;
+	vars.y = 3;
 	px = vars.x * SIZE;
 	py = vars.y * SIZE;
 	pa = 0;
 	pdx = cos(pa);
 	pdy = sin(pa);
-
 	mlx_hook(vars.win, 2, 1L<<0, key_hook, &vars);
 	mlx_loop_hook(vars.mlx, loop_hook, &vars);
 	vars.img = mlx_new_image(vars.mlx, 1920, 1080);
     vars.addr = mlx_get_data_addr(vars.img, &vars.bits_per_pixel, &vars.line_length, &vars.endian);
+	init_raycaster(&vars);
 	ft_putbackground(&vars);
 	playerposition(&vars);
     mlx_put_image_to_window(vars.mlx, vars.win, vars.img, 0, 0);
-	// init_raycaster(&vars);
+	mlx_put_image_to_window(vars.mlx, vars.cub.win, vars.cub.img, 0, 0);
     mlx_loop(vars.mlx);
 }
