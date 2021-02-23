@@ -6,7 +6,7 @@
 /*   By: bmoulin <bmoulin@42lyon.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/09 11:41:34 by bmoulin           #+#    #+#             */
-/*   Updated: 2021/02/19 11:45:32 by bmoulin          ###   ########lyon.fr   */
+/*   Updated: 2021/02/22 17:30:11 by bmoulin          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,8 +141,8 @@ void	RayCaster(double distance, t_vars *vars)
 	while (floor--)
 		my_mlx_pixel_put2(&vars->cub, cy, cx++, 0xFFFFF); // floor
 	cy++;
-	// if (cy >= MAP_WIDTH)
-	// 	cy = 0;
+	if (cy >= MAP_WIDTH)
+		cy = 0;
 	// mlx_put_image_to_window(vars->mlx, vars->cub.win, vars->cub.img, 0, 0);
 }
 
@@ -154,32 +154,43 @@ void	drawlinetowall(t_vars *vars) // changer pdx et pdy pour s'arreter a un mur.
 	double local_py = py;
 	double local_pdx = pdx;
 	double local_pdy = pdy;
-	double count = MAP_WIDTH/1000;
-	// double count = 0;
-	rdx = pdx;
-	rdy = pdy;
+	double angle_min = pa + FOV/2;
+	double inc = FOV/MAP_WIDTH;
+	rdx = cos(angle_min);
+	rdy = sin(angle_min);
 
 	index = ft_retindex(px, py, mapX);
-	while (count >= 0.001)
+	int i = 0;
+	while (i < MAP_WIDTH)
 	{
 		RayCaster(drawray(px, py, px + rdx * 50000, py + rdy * 50000, vars), vars);
-		// drawray(px, py, px + rdx * 50000, py + pdy * 50000, vars);
-		rdx = cos(pa + count);
-		rdy = sin(pa + count);
-		count -= 0.001;
+		angle_min -= inc;
+		if (angle_min < 0)
+			angle_min = 2*PI + angle_min;
+		rdx = cos(angle_min);
+		rdy = sin(angle_min);
+		i++;
 	}
-	cx = 0;
-	count = MAP_WIDTH/1000;
-	// ft_putbackground2(&vars->cub, color[0]);
-	while (count >= 0.001)
-	{
-		// drawray(px, py, px + pdx * 50000, py + rdy * 50000, vars);
-		RayCaster(drawray(px, py, px + rdx * 50000, py + rdy * 50000, vars), vars);
-		rdx = cos(pa - count);
-		rdy = sin(pa - count);
-		count -= 0.001;
-	}
-	cy = 0;
+	// while (count >= 0.001)
+	// {
+	// 	RayCaster(drawray(px, py, px + rdx * 50000, py + rdy * 50000, vars), vars);
+	// 	// drawray(px, py, px + rdx * 50000, py + pdy * 50000, vars);
+	// 	rdx = cos(pa + count);
+	// 	rdy = sin(pa + count);
+	// 	count -= 0.001;
+	// }
+	// cx = 0;
+	// count = MAP_WIDTH/1000;
+	// // ft_putbackground2(&vars->cub, color[0]);
+	// while (count >= 0.001)
+	// {
+	// 	// drawray(px, py, px + pdx * 50000, py + rdy * 50000, vars);
+	// 	RayCaster(drawray(px, py, px + rdx * 50000, py + rdy * 50000, vars), vars);
+	// 	rdx = cos(pa - count);
+	// 	rdy = sin(pa - count);
+	// 	count -= 0.001;
+	// }
+	// cy = 0;
 	printf("rdx : %f|rdy : %f|pa : %f|px : %f|py : %f\n", rdx, rdy, pa, px, py);
 	mlx_put_image_to_window(vars->mlx, vars->cub.win, vars->cub.img, 0, 0);
 }
@@ -346,6 +357,7 @@ int             main(void)
     vars.addr = mlx_get_data_addr(vars.img, &vars.bits_per_pixel, &vars.line_length, &vars.endian);
 	init_raycaster(&vars);
 	ft_putbackground(&vars);
+	// printf("vars.addr : %lld\n", vars.addr[0]);
 	playerposition(&vars);
     mlx_put_image_to_window(vars.mlx, vars.win, vars.img, 0, 0);
 	mlx_put_image_to_window(vars.mlx, vars.cub.win, vars.cub.img, 0, 0);

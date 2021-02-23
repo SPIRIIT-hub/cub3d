@@ -6,7 +6,7 @@
 /*   By: bmoulin <bmoulin@42lyon.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/11 15:39:48 by bmoulin           #+#    #+#             */
-/*   Updated: 2021/02/18 11:18:13 by bmoulin          ###   ########lyon.fr   */
+/*   Updated: 2021/02/22 17:03:09 by bmoulin          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@
 #define MINIMAP_WIDTH (int)512
 #define MAP_HEIGHT (int)512
 #define MAP_WIDTH (int)1024
-// #define SIZE 50
+#define FOV 1.0472
 #define SIZE (int)(MINIMAP_HEIGHT / 8)
 
 typedef struct  s_cub {
