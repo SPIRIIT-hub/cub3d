@@ -6,18 +6,18 @@
 /*   By: bmoulin <bmoulin@42lyon.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/09 11:41:34 by bmoulin           #+#    #+#             */
-/*   Updated: 2021/02/24 13:39:35 by bmoulin          ###   ########lyon.fr   */
+/*   Updated: 2021/02/24 13:58:51 by bmoulin          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-int mapX=9,mapY=8,mapS=64;
+int mapX=11,mapY=8,mapS=64;
 int	cx = 0, cy = MAP_WIDTH;
 double px, py, pdx, pdy, rdx, rdy, pa;
-int MINIMAP_HEIGHT = 512;
-int MINIMAP_WIDTH = 512;
-int SIZE = 0;
+int SIZE = 64;
+int MINIMAP_HEIGHT = 0;
+int MINIMAP_WIDTH = 0;
 
 // int		map[88] =
 // {
@@ -45,16 +45,16 @@ int SIZE = 0;
 // 	0,0,0,0,0,0,0,0,0,0,0,0
 // };
 
-int		map[72] =
+int		map[88] =
 {
-	1,1,1,1,1,1,1,1,1,
-	1,0,0,1,0,0,0,0,1,
-	1,0,0,1,0,0,0,0,1,
-	1,0,0,1,1,1,0,0,1,
-	1,0,0,0,0,0,0,0,1,
-	1,0,0,1,1,0,0,0,1,
-	1,0,0,0,0,0,0,0,1,
-	1,1,1,1,1,1,1,1,1
+	1,1,1,1,1,1,1,1,1,1,1,
+	1,0,0,1,0,0,0,0,0,0,1,
+	1,0,0,1,0,0,0,0,0,0,1,
+	1,0,0,1,1,1,0,0,0,0,1,
+	1,0,0,0,0,0,0,0,0,0,1,
+	1,0,0,1,1,0,0,0,0,0,1,
+	1,0,0,0,0,0,0,0,0,0,1,
+	1,1,1,1,1,1,1,1,1,1,1
 };
 
 int             close_exit(int keycode, t_vars *vars)
@@ -365,10 +365,12 @@ int             main(void)
 {
     t_vars    *vars;
 
-	if (mapX >= mapY)
-		SIZE = MINIMAP_HEIGHT / mapX;
-	else
-		SIZE = MINIMAP_HEIGHT / mapY;
+	// if (mapX >= mapY)
+	// 	SIZE = MINIMAP_HEIGHT / mapX;
+	// else
+	// 	SIZE = MINIMAP_HEIGHT / mapY;
+	MINIMAP_HEIGHT = mapX * SIZE;
+	MINIMAP_WIDTH = mapY * SIZE;
 
 	vars = wrmalloc(sizeof(t_vars));
 	vars->cub = wrmalloc(sizeof(t_cub));
