@@ -6,7 +6,7 @@
 /*   By: bmoulin <bmoulin@42lyon.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/11 15:39:48 by bmoulin           #+#    #+#             */
-/*   Updated: 2021/02/24 10:12:59 by bmoulin          ###   ########lyon.fr   */
+/*   Updated: 2021/02/24 13:28:05 by bmoulin          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,12 +23,11 @@
 #define KEY_A 0
 #define KEY_W 13
 #define PI 3.14159265359
-#define MINIMAP_HEIGHT (int)512
-#define MINIMAP_WIDTH (int)512
+//#define MINIMAP_HEIGHT (int)512
+// #define MINIMAP_WIDTH (int)512
 #define MAP_HEIGHT (int)512
 #define MAP_WIDTH (int)1024
 #define FOV 1.0472
-#define SIZE (int)(MINIMAP_HEIGHT / 8)
 
 typedef struct		s_list
 {

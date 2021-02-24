@@ -6,44 +6,62 @@
 /*   By: bmoulin <bmoulin@42lyon.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/09 11:41:34 by bmoulin           #+#    #+#             */
-/*   Updated: 2021/02/24 10:33:14 by bmoulin          ###   ########lyon.fr   */
+/*   Updated: 2021/02/24 13:39:35 by bmoulin          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-int mapX=8,mapY=8,mapS=64;
+int mapX=9,mapY=8,mapS=64;
 int	cx = 0, cy = MAP_WIDTH;
 double px, py, pdx, pdy, rdx, rdy, pa;
+int MINIMAP_HEIGHT = 512;
+int MINIMAP_WIDTH = 512;
+int SIZE = 0;
 
-int		map[64] =
-{
-	1,1,1,1,1,1,1,1,
-	1,0,0,1,0,0,0,1,
-	1,0,0,1,0,0,0,1,
-	1,0,0,1,1,1,0,1,
-	1,0,0,0,0,0,0,1,
-	1,0,0,1,1,0,0,1,
-	1,0,0,0,0,0,0,1,
-	1,1,1,1,1,1,1,1
-};
-
-// int		map[64] =
+// int		map[88] =
 // {
-// 	1,1,1,1,1,1,1,1,
-// 	1,0,0,0,0,0,0,1,
-// 	1,0,0,0,0,0,0,1,
-// 	1,0,0,0,0,0,0,1,
-// 	1,0,0,0,0,0,0,1,
-// 	1,0,0,0,0,0,0,1,
-// 	1,0,0,0,0,0,0,1,
-// 	1,1,1,1,1,1,1,1,
+// 	1,1,1,1,1,1,1,1,32,32,32,
+// 	1,0,0,1,0,0,0,1,32,32,32,
+// 	1,0,0,1,0,0,0,1,32,32,32,
+// 	1,0,0,1,1,1,0,1,32,32,32,
+// 	1,0,0,0,0,0,0,1,1,1,1,
+// 	1,0,0,1,1,0,0,0,0,0,1,
+// 	1,0,0,0,0,0,0,0,0,0,1,
+// 	1,1,1,1,1,1,1,1,1,1,1
 // };
+
+// int		map[144] =
+// {
+// 	1,1,1,1,1,1,1,1,32,32,32,32,
+// 	1,0,0,0,0,0,0,0,1,32,32,32,
+// 	1,0,0,0,0,1,0,0,1,32,32,32,
+// 	1,0,0,0,0,0,0,0,1,32,32,32,
+// 	1,0,0,1,1,1,1,0,1,1,1,1,
+// 	1,0,0,0,0,0,0,0,0,0,0,1,
+// 	1,0,0,0,1,0,0,0,0,0,0,1,
+// 	1,0,0,0,0,0,0,0,1,1,1,1,
+// 	1,1,1,1,1,1,1,1,32,32,32,32,
+// 	0,0,0,0,0,0,0,0,0,0,0,0
+// };
+
+int		map[72] =
+{
+	1,1,1,1,1,1,1,1,1,
+	1,0,0,1,0,0,0,0,1,
+	1,0,0,1,0,0,0,0,1,
+	1,0,0,1,1,1,0,0,1,
+	1,0,0,0,0,0,0,0,1,
+	1,0,0,1,1,0,0,0,1,
+	1,0,0,0,0,0,0,0,1,
+	1,1,1,1,1,1,1,1,1
+};
 
 int             close_exit(int keycode, t_vars *vars)
 {
 	// mlx_destroy_window(vars->mlx, vars->cub->win);
     // mlx_destroy_window(vars->mlx, vars->win);
+	wrdestroy();
 	exit(0);
 }
 
@@ -175,26 +193,6 @@ void	drawlinetowall(t_vars *vars) // changer pdx et pdy pour s'arreter a un mur.
 		rdy = sin(angle_min);
 		i++;
 	}
-	// while (count >= 0.001)
-	// {
-	// 	RayCaster(drawray(px, py, px + rdx * 50000, py + rdy * 50000, vars), vars);
-	// 	// drawray(px, py, px + rdx * 50000, py + pdy * 50000, vars);
-	// 	rdx = cos(pa + count);
-	// 	rdy = sin(pa + count);
-	// 	count -= 0.001;
-	// }
-	// cx = 0;
-	// count = MAP_WIDTH/1000;
-	// // ft_putbackground2(&vars->cub, color[0]);
-	// while (count >= 0.001)
-	// {
-	// 	// drawray(px, py, px + pdx * 50000, py + rdy * 50000, vars);
-	// 	RayCaster(drawray(px, py, px + rdx * 50000, py + rdy * 50000, vars), vars);
-	// 	rdx = cos(pa - count);
-	// 	rdy = sin(pa - count);
-	// 	count -= 0.001;
-	// }
-	// cy = 0;
 	mlx_put_image_to_window(vars->mlx, vars->cub->win, vars->cub->img, 0, 0);
 	mlx_put_image_to_window(vars->mlx, vars->win, vars->img, 0, 0);
 }
@@ -213,10 +211,6 @@ void		playerposition(t_vars *vars)
 		j = py;
 	}
 	drawlinetowall(vars);
-	// drawline(px+1, py+1, px + pdx * SIZE, py + pdy * SIZE, vars);
-	// drawline(px+2, py+1, px + pdx * SIZE, py + pdy * SIZE, vars);
-	// drawline(px+1, py+2, px + pdx * SIZE, py + pdy * SIZE, vars);
-	// drawline(px+2, py+2, px + pdx * SIZE, py + pdy * SIZE, vars);
 }
 
 int             key_hook(int keycode, t_vars *vars)
@@ -306,13 +300,13 @@ void		putWallInImage(t_vars *vars)
 	int x,y,xo,yo;
 	int tmpx;
 	int tmpy;
-	for (y=0;y<mapX;y++)
+	for (y=0;y<mapY;y++)
 	{
 		for(x=0;x<mapX;x++)
 		{
 			if(map[y*mapX+x] == 1)
 				putsquareWall(vars, x, y);
-			else
+			else if (!map[y*mapX+x])
 				putsquareVoid(vars, x, y);
 			xo=x*mapS;
 			yo=y*mapS;
@@ -370,6 +364,11 @@ void		init_raycaster(t_vars *vars)
 int             main(void)
 {
     t_vars    *vars;
+
+	if (mapX >= mapY)
+		SIZE = MINIMAP_HEIGHT / mapX;
+	else
+		SIZE = MINIMAP_HEIGHT / mapY;
 
 	vars = wrmalloc(sizeof(t_vars));
 	vars->cub = wrmalloc(sizeof(t_cub));
