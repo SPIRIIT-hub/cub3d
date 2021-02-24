@@ -6,13 +6,11 @@
 /*   By: bmoulin <bmoulin@42lyon.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/10 13:35:33 by bmoulin           #+#    #+#             */
-/*   Updated: 2021/02/10 13:45:50 by bmoulin          ###   ########lyon.fr   */
+/*   Updated: 2021/02/24 09:17:42 by bmoulin          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
+#include "cub3d.h"
 
 /*
 **	Small wrapper for malloc purpose

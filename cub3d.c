@@ -6,14 +6,14 @@
 /*   By: bmoulin <bmoulin@42lyon.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/09 11:41:34 by bmoulin           #+#    #+#             */
-/*   Updated: 2021/02/22 17:30:11 by bmoulin          ###   ########lyon.fr   */
+/*   Updated: 2021/02/24 10:33:14 by bmoulin          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
 int mapX=8,mapY=8,mapS=64;
-int	cx = 0, cy = 0;
+int	cx = 0, cy = MAP_WIDTH;
 double px, py, pdx, pdy, rdx, rdy, pa;
 
 int		map[64] =
@@ -40,10 +40,10 @@ int		map[64] =
 // 	1,1,1,1,1,1,1,1,
 // };
 
-int             close(int keycode, t_vars *vars)
+int             close_exit(int keycode, t_vars *vars)
 {
-	mlx_destroy_window(vars->cub.mlx, vars->cub.win);
-    mlx_destroy_window(vars->mlx, vars->win);
+	// mlx_destroy_window(vars->mlx, vars->cub->win);
+    // mlx_destroy_window(vars->mlx, vars->win);
 	exit(0);
 }
 
@@ -54,16 +54,17 @@ void            my_mlx_pixel_put(t_vars *data, int x, int y, int color)
     *(unsigned int*)dst = color;
 }
 
-void            my_mlx_pixel_put2(t_cub *data, int x, int y, int color)
+void            my_mlx_pixel_put2(t_vars *data, int x, int y, int color)
 {
     char    *dst;
-    dst = data->addr + (y * data->line_length + x * (data->bits_per_pixel / 8));
+    dst = data->cub->addr + (y * data->cub->line_length + x * (data->cub->bits_per_pixel / 8));
     *(unsigned int*)dst = color;
 }
 
 int             loop_hook(t_vars *vars)
 {
-	mlx_put_image_to_window(vars->mlx, vars->win, vars->img, 0, 0);
+	// mlx_put_image_to_window(vars->mlx, vars->win, vars->img, 0, 0);
+	// mlx_put_image_to_window(vars->mlx, vars->cub->win, vars->cub->img, 0, 0);
 	return (0);
 }
 
@@ -125,24 +126,27 @@ void	RayCaster(double distance, t_vars *vars)
 	// ft_putbackground2(&vars->cub, color[0]);
 	// printf("pixel_len : %d\n", pixel_len);
 	cx = MAP_HEIGHT/2;
-	while (mid_pix_len--)
+	while (mid_pix_len-- && cx >= 0)
 	{
-		my_mlx_pixel_put2(&vars->cub, cy, cx--, 0xFF0000);
+		my_mlx_pixel_put2(vars, cy, cx--, 0xFF0000);
 	}
-	while (sky--)
-		my_mlx_pixel_put2(&vars->cub, cy, cx--, 0x0097FF); // sky
-	my_mlx_pixel_put2(&vars->cub, cy, 0, 0x0097FF);
+	while (sky-- && cx >= 0)
+		my_mlx_pixel_put2(vars, cy, cx--, 0x0097FF); // sky
+	my_mlx_pixel_put2(vars, cy, 0, 0x0097FF);
 	mid_pix_len = pixel_len / 2;
 	cx = MAP_HEIGHT/2;
-	while (mid_pix_len--)
+	while (mid_pix_len-- && cx <= MAP_HEIGHT)
 	{
-		my_mlx_pixel_put2(&vars->cub, cy, cx++, 0xFF0000);
+		my_mlx_pixel_put2(vars, cy, cx++, 0xFF0000);
 	}
-	while (floor--)
-		my_mlx_pixel_put2(&vars->cub, cy, cx++, 0xFFFFF); // floor
-	cy++;
-	if (cy >= MAP_WIDTH)
-		cy = 0;
+	while (floor-- && cx <= MAP_HEIGHT)
+		my_mlx_pixel_put2(vars, cy, cx++, 0xFFFFF); // floor
+	cy--;
+	if (cy <= 0)
+		cy = MAP_WIDTH;
+	// if (cy >= MAP_WIDTH)
+	// 	cy = 0;
+
 	// mlx_put_image_to_window(vars->mlx, vars->cub.win, vars->cub.img, 0, 0);
 }
 
@@ -191,8 +195,8 @@ void	drawlinetowall(t_vars *vars) // changer pdx et pdy pour s'arreter a un mur.
 	// 	count -= 0.001;
 	// }
 	// cy = 0;
-	printf("rdx : %f|rdy : %f|pa : %f|px : %f|py : %f\n", rdx, rdy, pa, px, py);
-	mlx_put_image_to_window(vars->mlx, vars->cub.win, vars->cub.img, 0, 0);
+	mlx_put_image_to_window(vars->mlx, vars->cub->win, vars->cub->img, 0, 0);
+	mlx_put_image_to_window(vars->mlx, vars->win, vars->img, 0, 0);
 }
 
 void		playerposition(t_vars *vars)
@@ -209,19 +213,47 @@ void		playerposition(t_vars *vars)
 		j = py;
 	}
 	drawlinetowall(vars);
-	drawline(px+1, py+1, px + pdx * SIZE, py + pdy * SIZE, vars);
-	drawline(px+2, py+1, px + pdx * SIZE, py + pdy * SIZE, vars);
-	drawline(px+1, py+2, px + pdx * SIZE, py + pdy * SIZE, vars);
-	drawline(px+2, py+2, px + pdx * SIZE, py + pdy * SIZE, vars);
+	// drawline(px+1, py+1, px + pdx * SIZE, py + pdy * SIZE, vars);
+	// drawline(px+2, py+1, px + pdx * SIZE, py + pdy * SIZE, vars);
+	// drawline(px+1, py+2, px + pdx * SIZE, py + pdy * SIZE, vars);
+	// drawline(px+2, py+2, px + pdx * SIZE, py + pdy * SIZE, vars);
 }
 
 int             key_hook(int keycode, t_vars *vars)
 {
-	if (keycode == 53)	close(keycode, vars);
+	if (keycode == 53)	close_exit(keycode, vars);
 	if (keycode == KEY_A) { ft_putbackground(vars); pa -= 0.1;if (pa < 0)	pa += 2*PI;pdx = cos(pa); pdy = sin(pa); 		playerposition(vars);}
 	if (keycode == KEY_D) {	ft_putbackground(vars); pa += 0.1;if (pa > 2*PI)	pa -= 2*PI;pdx = cos(pa);	pdy = sin(pa);	playerposition(vars);}
-	if (keycode == KEY_W) { ft_putbackground(vars); px+=pdx; py += pdy; playerposition(vars);}
-	if (keycode == KEY_S) { ft_putbackground(vars); px-=pdx; py -= pdy; playerposition(vars);}
+	if (keycode == KEY_W) {
+		if (!map[ft_retindex(px + (pdx * 2), py + (pdy * 2), mapX)])
+		{
+			ft_putbackground(vars); px+=(pdx) * 2; py += (pdy) * 2;
+			playerposition(vars);
+		}
+	}
+	if (keycode == KEY_S) {
+		if (!map[ft_retindex(px - (pdx * 2), py - (pdy * 2), mapX)])
+		{
+			ft_putbackground(vars); px-=(pdx) * 2; py -= (pdy) * 2;
+			playerposition(vars);
+		}
+	}
+	return (0);
+}
+
+int             minimap_key_hook(int keycode, t_vars *vars)
+{
+	if (keycode == 53)	close_exit(keycode, vars);
+	// if (keycode == KEY_A) { ft_putbackground(vars); pa -= 0.1;if (pa < 0)	pa += 2*PI;pdx = cos(pa); pdy = sin(pa); 		playerposition(vars);}
+	// if (keycode == KEY_D) {	ft_putbackground(vars); pa += 0.1;if (pa > 2*PI)	pa -= 2*PI;pdx = cos(pa);	pdy = sin(pa);	playerposition(vars);}
+	// if (keycode == KEY_W) {
+	// 	if (!map[ft_retindex(px + (pdx * 2), py + (pdy * 2), mapX)])
+	// 		playerposition(vars->cub);
+	// }
+	// if (keycode == KEY_S) {
+	// 	if (!map[ft_retindex(px - (pdx * 2), py - (pdy * 2), mapX)])
+	// 		playerposition(vars->cub);
+	// }
 	return (0);
 }
 
@@ -312,54 +344,57 @@ void		ft_putbackground(t_vars *vars)
 	putWallInImage(vars);
 }
 
-void		ft_putbackground2(t_cub *vars, int color)
+void		ft_putbackground2(t_vars *vars)
 {
 	int x = -1;
 	int y = -1;
 
-	while (++x <= MAP_WIDTH)
+	while (++x <= MINIMAP_WIDTH)
 	{
-		while (++y <= MAP_HEIGHT)
-			my_mlx_pixel_put2(vars, x, y, color);
+		while (++y <= MINIMAP_HEIGHT)
+			my_mlx_pixel_put(vars, x, y, 0x00000000);
 		y = -1;
 	}
 }
 
 void		init_raycaster(t_vars *vars)
 {
-	vars->cub.win = mlx_new_window(vars->mlx, MAP_WIDTH, MAP_HEIGHT, "RayCaster");
-	mlx_hook(vars->cub.win, 2, 1L<<0, key_hook, &vars->cub);
-	mlx_loop_hook(vars->mlx, loop_hook, vars);
-	vars->cub.img = mlx_new_image(vars->mlx, 1920, 1080);
-	vars->cub.addr = mlx_get_data_addr(vars->cub.img, &vars->cub.bits_per_pixel, &vars->cub.line_length,
-                                 &vars->cub.endian);
+	vars->cub->win = mlx_new_window(vars->mlx, MAP_WIDTH, MAP_HEIGHT, "RayCaster");
+	mlx_hook(vars->cub->win, 2, 1L<<0, key_hook, vars);
+	mlx_loop_hook(vars->mlx, key_hook, vars);
+	vars->cub->img = mlx_new_image(vars->mlx, 1920, 1080);
+	vars->cub->addr = mlx_get_data_addr(vars->cub->img, &vars->cub->bits_per_pixel, &vars->cub->line_length,
+                                 &vars->cub->endian);
 }
 
 int             main(void)
 {
-    t_vars    vars;
+    t_vars    *vars;
 
-	vars.x = -1;
-	vars.y = -1;
-    vars.mlx = mlx_init();
-    vars.win = mlx_new_window(vars.mlx, MINIMAP_HEIGHT, MINIMAP_WIDTH, "Hello world!");
+	vars = wrmalloc(sizeof(t_vars));
+	vars->cub = wrmalloc(sizeof(t_cub));
+	vars->x = -1;
+	vars->y = -1;
+    vars->mlx = mlx_init();
+    vars->win = mlx_new_window(vars->mlx, MINIMAP_HEIGHT, MINIMAP_WIDTH, "MiniMap");
 
-	vars.x = 2;
-	vars.y = 3;
-	px = vars.x * SIZE;
-	py = vars.y * SIZE;
+	vars->x = 2;
+	vars->y = 3;
+	px = vars->x * SIZE;
+	py = vars->y * SIZE;
 	pa = 0;
 	pdx = cos(pa);
 	pdy = sin(pa);
-	mlx_hook(vars.win, 2, 1L<<0, key_hook, &vars);
-	mlx_loop_hook(vars.mlx, loop_hook, &vars);
-	vars.img = mlx_new_image(vars.mlx, 1920, 1080);
-    vars.addr = mlx_get_data_addr(vars.img, &vars.bits_per_pixel, &vars.line_length, &vars.endian);
-	init_raycaster(&vars);
-	ft_putbackground(&vars);
-	// printf("vars.addr : %lld\n", vars.addr[0]);
-	playerposition(&vars);
-    mlx_put_image_to_window(vars.mlx, vars.win, vars.img, 0, 0);
-	mlx_put_image_to_window(vars.mlx, vars.cub.win, vars.cub.img, 0, 0);
-    mlx_loop(vars.mlx);
+
+	mlx_hook(vars->win, 2, 1L<<0, minimap_key_hook, &vars);
+	mlx_loop_hook(vars->mlx, loop_hook, &vars);
+	vars->img = mlx_new_image(vars->mlx, 1920, 1080);
+    vars->addr = mlx_get_data_addr(vars->img, &vars->bits_per_pixel, &vars->line_length, &vars->endian);
+	init_raycaster(vars);
+	ft_putbackground(vars);
+	// printf("vars->addr : %lld\n", vars->addr[0]);
+	playerposition(vars);
+    mlx_put_image_to_window(vars->mlx, vars->win, vars->img, 0, 0);
+	mlx_put_image_to_window(vars->mlx, vars->cub->win, vars->cub->img, 0, 0);
+    mlx_loop(vars->mlx);
 }

@@ -6,7 +6,7 @@
 /*   By: bmoulin <bmoulin@42lyon.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/11 15:39:48 by bmoulin           #+#    #+#             */
-/*   Updated: 2021/02/22 17:03:09 by bmoulin          ###   ########lyon.fr   */
+/*   Updated: 2021/02/24 10:12:59 by bmoulin          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include <mlx.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <math.h>
 #define KEY_D 2
 #define KEY_S 1 
@@ -28,6 +29,12 @@
 #define MAP_WIDTH (int)1024
 #define FOV 1.0472
 #define SIZE (int)(MINIMAP_HEIGHT / 8)
+
+typedef struct		s_list
+{
+      void			*content;
+      struct s_list	*next;
+}					t_list;
 
 typedef struct  s_cub {
         void    *mlx;
@@ -51,10 +58,10 @@ typedef struct  s_vars {
 		int     bits_per_pixel;
 		int     line_length;
 		int     endian;
-		t_cub	cub;
+		t_cub	*cub;
 }               t_vars;
 
-int             close(int keycode, t_vars *vars);
+int             close_exit(int keycode, t_vars *vars);
 void            my_mlx_pixel_put(t_vars *data, int x, int y, int color);
 int             loop_hook(t_vars *vars);
 void			playerposition(t_vars *vars);
@@ -66,6 +73,12 @@ void			ft_putbackground(t_vars *vars);
 void			drawline(int x0, int y0, int x1, int y1, t_vars *vars);
 double			drawray(int x0, int y0, int x1, int y1, t_vars *vars);
 int				ft_retindex(int px, int py, int mapX);
-void			ft_putbackground2(t_cub *vars, int color);
+void			ft_putbackground2(t_vars *vars);
+void			*wrmalloc(unsigned long size);
+int				wrfree(void *ptr);
+void			wrdestroy(void);
+void			ft_lstadd_back(t_list **alst, t_list *new);
+t_list			*ft_lstlast(t_list *lst);
+
 
 #endif
