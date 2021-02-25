@@ -6,13 +6,13 @@
 /*   By: bmoulin <bmoulin@42lyon.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/09 11:41:34 by bmoulin           #+#    #+#             */
-/*   Updated: 2021/02/24 13:58:51 by bmoulin          ###   ########lyon.fr   */
+/*   Updated: 2021/02/25 11:34:43 by bmoulin          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-int mapX=11,mapY=8,mapS=64;
+int mapX=15,mapY=8,mapS=120;
 int	cx = 0, cy = MAP_WIDTH;
 double px, py, pdx, pdy, rdx, rdy, pa;
 int SIZE = 64;
@@ -45,16 +45,16 @@ int MINIMAP_WIDTH = 0;
 // 	0,0,0,0,0,0,0,0,0,0,0,0
 // };
 
-int		map[88] =
+char		map[120] =
 {
-	1,1,1,1,1,1,1,1,1,1,1,
-	1,0,0,1,0,0,0,0,0,0,1,
-	1,0,0,1,0,0,0,0,0,0,1,
-	1,0,0,1,1,1,0,0,0,0,1,
-	1,0,0,0,0,0,0,0,0,0,1,
-	1,0,0,1,1,0,0,0,0,0,1,
-	1,0,0,0,0,0,0,0,0,0,1,
-	1,1,1,1,1,1,1,1,1,1,1
+	6,6,6,6,1,1,1,1,1,1,1,1,1,1,1,
+	6,6,6,6,1,0,0,1,0,0,0,0,0,0,1,
+	6,6,6,6,1,0,0,1,0,0,0,0,0,0,1,
+	6,6,6,6,1,0,0,1,1,1,0,0,0,0,1,
+	6,6,6,6,1,0,0,0,0,0,0,0,0,0,1,
+	6,6,6,6,1,0,0,1,1,0,0,0,0,0,1,
+	6,6,6,6,1,0,0,0,0,0,0,0,0,0,1,
+	6,6,6,6,1,1,1,1,1,1,1,1,1,1,1
 };
 
 int             close_exit(int keycode, t_vars *vars)
@@ -379,10 +379,10 @@ int             main(void)
     vars->mlx = mlx_init();
     vars->win = mlx_new_window(vars->mlx, MINIMAP_HEIGHT, MINIMAP_WIDTH, "MiniMap");
 
-	vars->x = 2;
-	vars->y = 3;
-	px = vars->x * SIZE;
-	py = vars->y * SIZE;
+	vars->x = 6;
+	vars->y = 1;
+	px = (vars->x * SIZE) + SIZE / 2;
+	py = (vars->y * SIZE) + SIZE / 2;
 	pa = 0;
 	pdx = cos(pa);
 	pdy = sin(pa);
