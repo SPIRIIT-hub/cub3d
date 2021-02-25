@@ -1,23 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   libft.c                                            :+:      :+:    :+:   */
+/*   get_next_line.h                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bmoulin <bmoulin@42lyon.fr>                +#+  +:+       +#+        */
+/*   By: efarin <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/02/24 09:20:56 by bmoulin           #+#    #+#             */
-/*   Updated: 2021/02/25 13:10:53 by bmoulin          ###   ########lyon.fr   */
+/*   Created: 2021/02/18 11:00:20 by efarin            #+#    #+#             */
+/*   Updated: 2021/02/18 11:00:22 by efarin           ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub3d.h"
+#ifndef GET_NEXT_LINE_H
+# define GET_NEXT_LINE_H
+# include <unistd.h>
+# include <stdlib.h>
+# include <stdio.h>
 
-t_list		*ft_lstlast(t_list *lst)
-{
-	if (!lst)
-		return (lst);
-	while (lst->next)
-		lst = lst->next;
-	return (lst);
-}
+int get_next_line(int fd, char **line);
 
+#endif

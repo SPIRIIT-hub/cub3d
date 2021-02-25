@@ -1,6 +1,7 @@
 NAME = cub3D
 
-SRC = cub3d.c utils.c ft_wrmalloc.c libft.c
+SRC =	cub3d.c utils.c ft_wrmalloc.c libft.c \
+		cub.c checkelements.c ft_strtrim.c get_next_line.c islinevalid.c libftstuff.c structstuff.c whatsthemap.c
 
 OBJ = ${SRC:.c=.o}
 
