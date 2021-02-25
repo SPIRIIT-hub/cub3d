@@ -6,7 +6,7 @@
 /*   By: bmoulin <bmoulin@42lyon.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/09 11:41:34 by bmoulin           #+#    #+#             */
-/*   Updated: 2021/02/25 14:29:02 by bmoulin          ###   ########lyon.fr   */
+/*   Updated: 2021/02/25 14:37:13 by bmoulin          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -388,8 +388,8 @@ int             main(int arc, char **arv)
 	vars->data->y = vars->pars->yplayer;
 	vars->data->cx = 0;
 	vars->data->cy = vars->data->map_width;
-	printf("MapX : %d\n", vars->data->mapX);
-	printf("MapY : %d\n", vars->data->mapY);
+	// printf("MapX : %d\n", vars->data->mapX);
+	// printf("MapY : %d\n", vars->data->mapY);
 	// printf("vars->data->map_height : %d\n", vars->data->map_height);
 	// printf("vars->data->map_width : %d\n", vars->data->map_width);
 
