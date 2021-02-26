@@ -6,7 +6,7 @@
 /*   By: bmoulin <bmoulin@42lyon.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/11 15:39:48 by bmoulin           #+#    #+#             */
-/*   Updated: 2021/02/25 13:44:49 by bmoulin          ###   ########lyon.fr   */
+/*   Updated: 2021/02/26 11:51:16 by bmoulin          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,6 @@
 #define MAP_HEIGHT (int)512
 #define MAP_WIDTH (int)1024
 #define FOV 1.0472
-
 
 typedef struct		s_list
 {
