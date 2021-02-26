@@ -65,10 +65,18 @@ int             close_exit(int keycode, t_vars *vars)
 	exit(0);
 }
 
+char	*get_pixel(t_img *data, int x, int y)
+{
+	char    *dst;
+    dst = data->addr + (y * data->line_length + x * (data->bits_per_pixel / 8));
+	return (dst);
+}
+
 void            my_mlx_pixel_put(t_vars *data, int x, int y, int color)
 {
     char    *dst;
     dst = data->addr + (y * data->line_length + x * (data->bits_per_pixel / 8));
+	printf("here . %x\n", *(unsigned int*)dst);
     *(unsigned int*)dst = color;
 }
 
@@ -132,7 +140,7 @@ void	RayCaster(double distance, t_vars *vars)
 	int loop_pixel = vars->data->map_width;
 	int pixel_len = ceil(((vars->data->map_height/2)/distance) * SIZE);
 	int mid_pix_len = pixel_len / 2;
-	int i = 0;
+	//int i = 0;
 	int sky = ((vars->data->map_height - pixel_len) / 2) + 1;
 	int floor = sky;
 	// if (colortab >= 4)
@@ -147,8 +155,10 @@ void	RayCaster(double distance, t_vars *vars)
 	while (sky-- && vars->data->cx >= 0)
 		my_mlx_pixel_put2(vars, vars->data->cy, vars->data->cx--, 0x0097FF); // sky
 	my_mlx_pixel_put2(vars, vars->data->cy, 0, 0x0097FF);
+
 	mid_pix_len = pixel_len / 2;
 	vars->data->cx = vars->data->map_height/2;
+
 	while (mid_pix_len-- && vars->data->cx <= vars->data->map_height)
 	{
 		my_mlx_pixel_put2(vars, vars->data->cy, vars->data->cx++, 0xFF0000);
@@ -211,9 +221,37 @@ void		playerposition(t_vars *vars)
 
 int             key_hook(int keycode, t_vars *vars)
 {
+	//if (keycode < 1000)
+	//	printf("keycode : %d\n", keycode);
+		//printf("pdx : %f|pdy : %f\n", vars->data->pdx, vars->data->pdy);
 	if (keycode == 53)	close_exit(keycode, vars);
-	if (keycode == KEY_A) { ft_putbackground(vars); vars->data->pa -= 0.1;if (vars->data->pa < 0)	vars->data->pa += 2*PI;vars->data->pdx = cos(vars->data->pa); vars->data->pdy = sin(vars->data->pa); 		playerposition(vars);}
-	if (keycode == KEY_D) {	ft_putbackground(vars); vars->data->pa += 0.1;if (vars->data->pa > 2*PI)	vars->data->pa -= 2*PI;vars->data->pdx = cos(vars->data->pa);	vars->data->pdy = sin(vars->data->pa);	playerposition(vars);}
+	if (keycode == KEY_LEFT) { ft_putbackground(vars); vars->data->pa -= 0.1;if (vars->data->pa < 0)	vars->data->pa += 2*PI;vars->data->pdx = cos(vars->data->pa); vars->data->pdy = sin(vars->data->pa); 		playerposition(vars);}
+	if (keycode == KEY_RIGHT) {	ft_putbackground(vars); vars->data->pa += 0.1;if (vars->data->pa > 2*PI)	vars->data->pa -= 2*PI;vars->data->pdx = cos(vars->data->pa);	vars->data->pdy = sin(vars->data->pa);	playerposition(vars);}
+	/*if (keycode == KEY_A)
+	{
+		printf("pdx : %f|pdy : %f\n", vars->data->pdx, vars->data->pdy);
+		if (vars->data->pdx >= 0 && vars->data->pdy <= 0)
+		{
+			ft_putbackground(vars); vars->data->px+=(vars->data->pdx - 1) * 2; vars->data->py += (vars->data->pdy - 1) * 2;
+		}
+		else if (vars->data->pdx <= 0 && vars->data->pdy <= 0)
+		{
+			ft_putbackground(vars); vars->data->px+=(vars->data->pdx - 1) * 2; vars->data->py += (vars->data->pdy - -1) * 2;
+		}
+		else if (vars->data->pdx >= 0 && vars->data->pdy >= 0)
+		{
+			ft_putbackground(vars); vars->data->px+=(vars->data->pdx - -1) * 2; vars->data->py += (vars->data->pdy - 1) * 2;
+		}
+		else if (vars->data->pdx <= 0 && vars->data->pdy >= 0)
+		{
+			ft_putbackground(vars); vars->data->px+=(vars->data->pdx - -1) * 2; vars->data->py += (vars->data->pdy - -1) * 2;
+		}
+		else
+		{
+			ft_putbackground(vars); vars->data->px+=(vars->data->pdx - (vars->data->pdx > 0 ? 1 : -1)) * 2; vars->data->py += (vars->data->pdy - (vars->data->pdy > 0 ? 1 : -1)) * 2;
+		}
+		playerposition(vars);
+	}*/
 	if (keycode == KEY_W) {
 		if (vars->pars->map[ft_retindex(vars->data->px + (vars->data->pdx * 2), vars->data->py + (vars->data->pdy * 2), vars->data->mapX)] != '1')
 		{
@@ -365,6 +403,7 @@ int             main(int arc, char **arv)
 	vars->cub = wrmalloc(sizeof(t_cub));
 	vars->data = wrmalloc(sizeof(t_data));
 	vars->pars = wrmalloc(sizeof(t_struct));
+	vars->txt = wrmalloc(sizeof(t_img));
 
 	// if (mapX >= mapY)
 	// 	SIZE = MINIMAP_HEIGHT / mapX;
@@ -377,6 +416,14 @@ int             main(int arc, char **arv)
 	}
 	// printf("vars->pars->map : |%s|\n", vars->pars->map);
 	// return (0);
+	vars->txt->relative_path = vars->pars->pathtoNO;
+	vars->txt->img_width = 64;
+	vars->txt->img_width = 64;
+	int     img_width = 64;
+	int     img_height = 64;
+
+	//vars->txt->img = mlx_xpm_file_to_image(vars->mlx, vars->txt->relative_path, &vars->txt->img_width, &vars->txt->img_height);
+	//printf("pathN : %s\n", vars->pars->pathtoNO);
 	vars->data->mapS = ft_strlen(vars->pars->map);
 	vars->data->mapX = vars->pars->lenmax;
 	vars->data->mapY = vars->data->mapS / vars->data->mapX;
@@ -412,7 +459,14 @@ int             main(int arc, char **arv)
 
 	vars->data->px = (vars->data->x * SIZE) + SIZE / 2;
 	vars->data->py = (vars->data->y * SIZE) + SIZE / 2;
-	vars->data->pa = 0;
+	if (vars->pars->position == 'N')
+		vars->data->pa = NORTH;
+	else if (vars->pars->position == 'W')
+		vars->data->pa = WEST;
+	else if (vars->pars->position == 'E')
+		vars->data->pa = EAST;
+	else
+		vars->data->pa = SOUTH;
 	vars->data->pdx = cos(vars->data->pa);
 	vars->data->pdy = sin(vars->data->pa);
 
@@ -420,6 +474,26 @@ int             main(int arc, char **arv)
 	mlx_loop_hook(vars->mlx, loop_hook, &vars);
 	vars->img = mlx_new_image(vars->mlx, vars->data->minimap_height, vars->data->minimap_width);
     vars->addr = mlx_get_data_addr(vars->img, &vars->bits_per_pixel, &vars->line_length, &vars->endian);
+
+	int i = 0;
+	int j = 0;
+	if (!(vars->txt->img = mlx_xpm_file_to_image(vars->mlx, vars->txt->relative_path, &img_width, &img_height)))
+		printf("Error, img not found");
+	vars->txt->addr = mlx_get_data_addr(vars->txt->img, &vars->txt->bits_per_pixel, &vars->txt->line_length, &vars->txt->endian);
+	/*
+	while (i < 64)
+	{
+		while (j < 64)
+		{
+			my_mlx_pixel_put(vars, i, j, *(unsigned int*)get_pixel(vars->txt, i, j));
+			//printf("color i %d : %x\n", i, *(unsigned int*)get_pixel(vars->txt, i, j));
+			j++;
+		}
+		j = 0;
+		i++;
+	}
+	*/
+	//mlx_put_image_to_window(vars->mlx, vars->win, vars->img, 0, 0);
 	init_raycaster(vars);
 	ft_putbackground(vars);
 	// printf("vars->addr : %lld\n", vars->addr[0]);

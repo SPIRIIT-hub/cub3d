@@ -29,7 +29,13 @@
 #define KEY_S 1 
 #define KEY_A 0
 #define KEY_W 13
+#define KEY_LEFT 123
+#define KEY_RIGHT 124
 #define PI 3.14159265359
+#define NORTH 4.71239
+#define SOUTH 1.5708
+#define EAST 3.14159
+#define WEST 0
 //#define MINIMAP_HEIGHT (int)512
 // #define MINIMAP_WIDTH (int)512
 #define MAP_HEIGHT (int)512
@@ -101,6 +107,17 @@ typedef struct  s_data {
 		int		y;
 }               t_data;
 
+typedef struct  	s_img {
+		int    	bits_per_pixel;
+		int    	line_length;
+		int     endian;
+		char    *addr;
+		void    *img;
+    	char    *relative_path;
+    	int     img_width;
+		int     img_height;
+}               	t_img;
+
 typedef struct  	s_vars {
         void    	*mlx;
         void    	*win;
@@ -114,6 +131,7 @@ typedef struct  	s_vars {
 		t_cub		*cub;
 		t_struct	*pars;
 		t_data		*data;
+		t_img		*txt;
 }               	t_vars;
 
 int             close_exit(int keycode, t_vars *vars);
