@@ -77,7 +77,7 @@ void            my_mlx_pixel_put(t_vars *data, int x, int y, int color)
     char    *dst;
     dst = data->addr + (y * data->line_length + x * (data->bits_per_pixel / 8));
 	//printf("here . %x\n", *(unsigned int*)dst);
-    *(unsigned int*)dst = color;
+	*(unsigned int*)dst = color;
 }
 
 void            my_mlx_pixel_put2(t_vars *data, int x, int y, int color)
@@ -113,11 +113,55 @@ double drawray(int x0, int y0, int x1, int y1, t_vars *vars)
 	index = ft_retindex(x0, y0, vars->data->mapX);
   }
 	distance = sqrt((vars->data->px-x0)*(vars->data->px-x0) + (vars->data->py-y0)*(vars->data->py-y0));
-	return (distance);
+	return ((distance / PI));
 }
 
 void	RayCaster(double distance, t_vars *vars) //mettre technique clsaad pour sky floor et wall
 {
+	int pixel_len = ceil(((vars->data->map_height/2)/distance) * SIZE);
+	int nbpx = pixel_len / 64;
+	static int j = 0;
+	int i = 0;
+
+	if (!vars->data->cx)
+		vars->data->cx = vars->data->map_width;
+	while (vars->data->cy <= (vars->data->map_height / 2) - ((pixel_len / 2) / 2))
+		my_mlx_pixel_put2(vars, vars->data->cx, vars->data->cy++, 0xFFFFF);
+	while (vars->data->cy <= vars->data->map_height)
+		my_mlx_pixel_put2(vars, vars->data->cx, vars->data->cy++, 0xBBBBB);
+
+	vars->data->cy = (vars->data->minimap_height / 2) - (pixel_len / 2);
+	if (vars->data->cy < 0)
+	{
+		vars->data->cy = 0;
+	}
+
+	while (pixel_len-- && vars->data->cy <= vars->data->map_height)
+	{
+		//printf("cy : %d\n", vars->data->cy);
+		while(pixel_len && i < nbpx && vars->data->cy <= vars->data->map_height)
+		{
+			my_mlx_pixel_put2(vars, vars->data->cx, vars->data->cy++, *(unsigned int*)get_pixel(vars->txt, vars->data->imgx, vars->data->imgy));
+			i++;
+			pixel_len--;
+		}
+		i = 0;
+		vars->data->imgy++;
+	}
+	j++;
+	vars->data->imgy = 0;
+	if (j > nbpx)
+	{
+		j = 0;
+		vars->data->imgx++;
+	}
+	if (vars->data->imgx >= 64)
+		vars->data->imgx = 0;
+
+	vars->data->cx--;
+	vars->data->cy = 0;
+
+	/*
 	int loop_pixel = vars->data->map_width;
 	int pixel_len = ceil(((vars->data->map_height/2)/distance) * SIZE);
 	int mid_pix_len = pixel_len / 2;
@@ -127,6 +171,9 @@ void	RayCaster(double distance, t_vars *vars) //mettre technique clsaad pour sky
 	int nb_img_px = ceil(pixel_len / vars->txt->img_width);
 
 	vars->data->cx = vars->data->map_height/2;
+
+
+
 	while (mid_pix_len-- && vars->data->cx >= 0)
 	{
 		if (imgy >= vars->txt->img_height)
@@ -189,6 +236,7 @@ void	RayCaster(double distance, t_vars *vars) //mettre technique clsaad pour sky
 	vars->data->cy--;
 	if (vars->data->cy <= 0)
 		vars->data->cy = vars->data->map_width;
+	*/
 }
 
 void	drawlinetowall(t_vars *vars) // changer pdx et pdy pour s'arreter a un mur.
@@ -199,21 +247,21 @@ void	drawlinetowall(t_vars *vars) // changer pdx et pdy pour s'arreter a un mur.
 	double local_py = vars->data->py;
 	double local_pdx = vars->data->pdx;
 	double local_pdy = vars->data->pdy;
-	double angle_min = vars->data->pa + FOV/2;
+	vars->data->angle_min = vars->data->pa + FOV/2;
 	double inc = FOV/vars->data->map_width;
-	vars->data->rdx = cos(angle_min);
-	vars->data->rdy = sin(angle_min);
+	vars->data->rdx = cos(vars->data->angle_min);
+	vars->data->rdy = sin(vars->data->angle_min);
 
 	index = ft_retindex(vars->data->px, vars->data->py, vars->data->mapX);
 	int i = 0;
 	while (i < vars->data->map_width)
 	{
 		RayCaster(drawray(vars->data->px, vars->data->py, vars->data->px + vars->data->rdx * 50000, vars->data->py + vars->data->rdy * 50000, vars), vars);
-		angle_min -= inc;
-		if (angle_min < 0)
-			angle_min = 2*PI + angle_min;
-		vars->data->rdx = cos(angle_min);
-		vars->data->rdy = sin(angle_min);
+		vars->data->angle_min -= inc;
+		if (vars->data->angle_min < 0)
+			vars->data->angle_min = 2*PI + vars->data->angle_min;
+		vars->data->rdx = cos(vars->data->angle_min);
+		vars->data->rdy = sin(vars->data->angle_min);
 		i++;
 	}
 	mlx_put_image_to_window(vars->mlx, vars->cub->win, vars->cub->img, 0, 0);
@@ -244,31 +292,6 @@ int             key_hook(int keycode, t_vars *vars)
 	if (keycode == 53)	close_exit(keycode, vars);
 	if (keycode == KEY_LEFT) { ft_putbackground(vars); vars->data->pa -= 0.1;if (vars->data->pa < 0)	vars->data->pa += 2*PI;vars->data->pdx = cos(vars->data->pa); vars->data->pdy = sin(vars->data->pa); 		playerposition(vars);}
 	if (keycode == KEY_RIGHT) {	ft_putbackground(vars); vars->data->pa += 0.1;if (vars->data->pa > 2*PI)	vars->data->pa -= 2*PI;vars->data->pdx = cos(vars->data->pa);	vars->data->pdy = sin(vars->data->pa);	playerposition(vars);}
-	/*if (keycode == KEY_A)
-	{
-		printf("pdx : %f|pdy : %f\n", vars->data->pdx, vars->data->pdy);
-		if (vars->data->pdx >= 0 && vars->data->pdy <= 0)
-		{
-			ft_putbackground(vars); vars->data->px+=(vars->data->pdx - 1) * 2; vars->data->py += (vars->data->pdy - 1) * 2;
-		}
-		else if (vars->data->pdx <= 0 && vars->data->pdy <= 0)
-		{
-			ft_putbackground(vars); vars->data->px+=(vars->data->pdx - 1) * 2; vars->data->py += (vars->data->pdy - -1) * 2;
-		}
-		else if (vars->data->pdx >= 0 && vars->data->pdy >= 0)
-		{
-			ft_putbackground(vars); vars->data->px+=(vars->data->pdx - -1) * 2; vars->data->py += (vars->data->pdy - 1) * 2;
-		}
-		else if (vars->data->pdx <= 0 && vars->data->pdy >= 0)
-		{
-			ft_putbackground(vars); vars->data->px+=(vars->data->pdx - -1) * 2; vars->data->py += (vars->data->pdy - -1) * 2;
-		}
-		else
-		{
-			ft_putbackground(vars); vars->data->px+=(vars->data->pdx - (vars->data->pdx > 0 ? 1 : -1)) * 2; vars->data->py += (vars->data->pdy - (vars->data->pdy > 0 ? 1 : -1)) * 2;
-		}
-		playerposition(vars);
-	}*/
 	if (keycode == KEY_W) {
 		if (vars->pars->map[ft_retindex(vars->data->px + (vars->data->pdx * 2), vars->data->py + (vars->data->pdy * 2), vars->data->mapX)] != '1')
 		{
@@ -310,17 +333,20 @@ void		putsquareWall(t_vars *vars, int x, int y)
 	y *= 	SIZE;
 	tmpx = x;
 	tmpy = y;
-	while (x++ <= tmpx + SIZE)
+	while (x++ < (tmpy + SIZE) && x < vars->data->minimap_height)
 	{
-		while (y++ <= tmpy + SIZE)
-			my_mlx_pixel_put(vars, x, y, 0xFFFFFF);
+		while (y++ < (tmpy + SIZE) && y < vars->data->minimap_width)
+		{
+			my_mlx_pixel_put(vars, x, y, 0xFFFFF);
+		}
 		y = tmpy;
+		//printf("x : %d, %d\n", x, vars->data->minimap_height);
 	}
 	y = tmpy;
 	x = tmpx;
-	while (x++ <= tmpx + SIZE)
+	while (x++ <= tmpx + SIZE && x < vars->data->minimap_height)
 		my_mlx_pixel_put(vars, x, y, 0x9F9F9F);
-	while (y++ <= tmpy + SIZE)
+	while (y++ <= tmpy + SIZE && y < vars->data->minimap_width)
 		my_mlx_pixel_put(vars, tmpx, y, 0x9F9F9F);
 }
 
@@ -332,17 +358,17 @@ void		putsquareVoid(t_vars *vars, int x, int y)
 	y *= 	SIZE;
 	tmpx = x;
 	tmpy = y;
-	while (x++ <= tmpx + SIZE)
+	while (x++ <= tmpx + SIZE && x < vars->data->minimap_height)
 	{
-		while (y++ <= tmpy + SIZE)
+		while (y++ <= tmpy + SIZE && y < vars->data->minimap_width)
 			my_mlx_pixel_put(vars, x, y, 0x00000000);
 		y = tmpy;
 	}
 	y = tmpy;
 	x = tmpx;
-	while (x++ <= tmpx + SIZE)
+	while (x++ <= tmpx + SIZE && x < vars->data->minimap_height)
 		my_mlx_pixel_put(vars, x, y, 0x9F9F9F);
-	while (y++ <= tmpy + SIZE)
+	while (y++ <= tmpy + SIZE && y < vars->data->minimap_width)
 		my_mlx_pixel_put(vars, tmpx, y, 0x9F9F9F);
 }
 
@@ -363,18 +389,48 @@ void		putWallInImage(t_vars *vars)
 			yo=y*vars->data->mapS;
 		}
 	}
-	y--;
-	x--;
-	tmpy = y * SIZE;
-	tmpx = x * SIZE;
-	x = 0;
-	while (x++ <= tmpx + SIZE)
-		my_mlx_pixel_put(vars, x, tmpy + SIZE + 1, 0x00000);
-	y = 0;
-	while (y++ <= tmpy + SIZE)
-		my_mlx_pixel_put(vars, tmpx + SIZE + 1, y, 0x00000);
 }
+/*
+void				mymap(t_vars *vars)
+{
+	int				i;
+	int				j;
+	int				x;
+	int				y;
+	int				k;
+	unsigned int	color;
 
+	i = 0;
+	y = 0;
+	x = 0;
+	while (i < vars->data->mapS)
+	{
+		if (vars->pars->map[i] == '0')
+			color = 0x4B0082;
+		if (vars->pars->map[i] == '1')
+			color = 0x00FF00;
+		j = 0;
+		y = (i / vars->data->mapX) * vars->data->mapS;
+		while (j < vars->data->mapS && y < vars->data->minimap_width)
+		{
+			k = 0;
+			x = (i % vars->data->mapY) * vars->data->mapS;
+			while (k < vars->data->mapS && x < vars->data->minimap_height)
+			{
+				if (x % vars->data->mapS == 0 || y % vars->data->mapS == 0)
+					mlx_pixel_put(vars->mlx, vars->win, x, y, 0x0000FF);
+				else
+					mlx_pixel_put(vars->mlx, vars->win, x, y, color);
+				x++;
+				k++;
+			}
+			y++;
+			j++;
+		}
+		i++;
+	}
+}
+*/
 void		ft_putbackground(t_vars *vars)
 {
 	int x = -1;
@@ -382,8 +438,11 @@ void		ft_putbackground(t_vars *vars)
 
 	while (++x <= vars->data->minimap_height)
 	{
-		while (++y <= vars->data->minimap_width)
-			my_mlx_pixel_put(vars, x, y, 0x00000000);
+		while (++y < vars->data->minimap_width)
+		{
+		//	printf("here\n");
+			my_mlx_pixel_put(vars, x, y, 0x00000);
+		}
 		y = -1;
 	}
 	putWallInImage(vars);
@@ -450,8 +509,10 @@ int             main(int arc, char **arv)
 	vars->data->map_width = vars->pars->Rx;
 	vars->data->x = vars->pars->xplayer;
 	vars->data->y = vars->pars->yplayer;
-	vars->data->cx = 0;
-	vars->data->cy = vars->data->map_width;
+	vars->data->cy = 0;
+	vars->data->cx = vars->data->map_width;
+	vars->data->imgx = 0;
+	vars->data->imgy = 0;
 	// printf("MapX : %d\n", vars->data->mapX);
 	// printf("MapY : %d\n", vars->data->mapY);
 	// printf("vars->data->map_height : %d\n", vars->data->map_height);

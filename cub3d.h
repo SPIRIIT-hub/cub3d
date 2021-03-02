@@ -95,6 +95,9 @@ typedef struct  s_data {
 		double	pdy;
 		double	rdx;
 		double	rdy;
+		double	angle_min;
+		int		imgx;
+		int		imgy;
 		int		minimap_height;
 		int		minimap_width;
 		int		map_height;
