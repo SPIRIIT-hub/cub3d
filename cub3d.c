@@ -113,12 +113,13 @@ double drawray(int x0, int y0, int x1, int y1, t_vars *vars)
 	index = ft_retindex(x0, y0, vars->data->mapX);
   }
 	distance = sqrt((vars->data->px-x0)*(vars->data->px-x0) + (vars->data->py-y0)*(vars->data->py-y0));
-	return ((distance / PI));
+	//printf("distance : %f, angle : %f\n", (sin(vars->data->angle_min)), vars->data->angle_min);
+	return (distance / PI);
 }
 
 void	RayCaster(double distance, t_vars *vars) //mettre technique clsaad pour sky floor et wall
 {
-	int pixel_len = ceil(((vars->data->map_height/2)/distance) * SIZE);
+	int pixel_len = ceil((vars->data->map_height/2)/distance) * SIZE;
 	int nbpx = pixel_len / 64;
 	static int j = 0;
 	int i = 0;
@@ -126,7 +127,10 @@ void	RayCaster(double distance, t_vars *vars) //mettre technique clsaad pour sky
 	if (!vars->data->cx)
 		vars->data->cx = vars->data->map_width;
 	while (vars->data->cy <= (vars->data->map_height / 2) - ((pixel_len / 2) / 2))
+	{
+		//printf("cy : %f\n", distance);
 		my_mlx_pixel_put2(vars, vars->data->cx, vars->data->cy++, 0xFFFFF);
+	}
 	while (vars->data->cy <= vars->data->map_height)
 		my_mlx_pixel_put2(vars, vars->data->cx, vars->data->cy++, 0xBBBBB);
 
@@ -292,6 +296,20 @@ int             key_hook(int keycode, t_vars *vars)
 	if (keycode == 53)	close_exit(keycode, vars);
 	if (keycode == KEY_LEFT) { ft_putbackground(vars); vars->data->pa -= 0.1;if (vars->data->pa < 0)	vars->data->pa += 2*PI;vars->data->pdx = cos(vars->data->pa); vars->data->pdy = sin(vars->data->pa); 		playerposition(vars);}
 	if (keycode == KEY_RIGHT) {	ft_putbackground(vars); vars->data->pa += 0.1;if (vars->data->pa > 2*PI)	vars->data->pa -= 2*PI;vars->data->pdx = cos(vars->data->pa);	vars->data->pdy = sin(vars->data->pa);	playerposition(vars);}
+	// if (keycode == KEY_A)
+	// {
+	// 	ft_putbackground(vars);
+	// 	// vars->data->px -= (vars->data->pdy) * 2;
+	// 	vars->data->py -= (vars->data->pdx) * 2;
+	// 	playerposition(vars);
+	// }
+	// if (keycode == KEY_D)
+	// {
+	// 	ft_putbackground(vars);
+	// 	vars->data->px -= (vars->data->pdy) * 2;
+	// 	//vars->data->py -= (vars->data->pdy) * 2;
+	// 	playerposition(vars);
+	// }
 	if (keycode == KEY_W) {
 		if (vars->pars->map[ft_retindex(vars->data->px + (vars->data->pdx * 2), vars->data->py + (vars->data->pdy * 2), vars->data->mapX)] != '1')
 		{
@@ -329,6 +347,8 @@ void		putsquareWall(t_vars *vars, int x, int y)
 {
 	int		tmpx;
 	int		tmpy;
+	static int count = 0;
+	printf("WALL count : %d\n", count++);
 	x *= 	SIZE;
 	y *= 	SIZE;
 	tmpx = x;
@@ -356,6 +376,8 @@ void		putsquareVoid(t_vars *vars, int x, int y)
 	int		tmpy;
 	x *= 	SIZE;
 	y *= 	SIZE;
+	static int count = 0;
+	printf("VOIDcount : %d\n", count++);
 	tmpx = x;
 	tmpy = y;
 	while (x++ <= tmpx + SIZE && x < vars->data->minimap_height)
@@ -557,7 +579,10 @@ int             main(int arc, char **arv)
 	int j = 0;
 	printf("\n\npath : %s\n\n", vars->txt->relative_path);
 	if (!(vars->txt->img = mlx_png_file_to_image(vars->mlx, vars->txt->relative_path, &img_width, &img_height)))
+	{
 		printf("Error, img not found");
+		return (0);
+	}
 	vars->txt->addr = mlx_get_data_addr(vars->txt->img, &vars->txt->bits_per_pixel, &vars->txt->line_length, &vars->txt->endian);
 	/*
 	while (i < 64)
