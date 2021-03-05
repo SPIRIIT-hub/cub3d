@@ -133,7 +133,10 @@ typedef struct  	s_vars {
 		t_cub		*cub;
 		t_struct	*pars;
 		t_data		*data;
-		t_img		*txt;
+		t_img		*txtn;
+		t_img		*txts;
+		t_img		*txtw;
+		t_img		*txte;
 }               	t_vars;
 
 int             close_exit(int keycode, t_vars *vars);
@@ -146,7 +149,7 @@ void			putsquareVoid(t_vars *vars, int x, int y);
 void			putWallInImage(t_vars *vars);
 void			ft_putbackground(t_vars *vars);
 void			drawline(int x0, int y0, int x1, int y1, t_vars *vars);
-double			drawray(int x0, int y0, int x1, int y1, t_vars *vars);
+double			drawray(double x0, double y0, double x1, double y1, t_vars *vars);
 int				ft_retindex(int px, int py, int mapX);
 void			ft_putbackground2(t_vars *vars);
 void			*wrmalloc(unsigned long size);

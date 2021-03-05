@@ -94,32 +94,78 @@ int             loop_hook(t_vars *vars)
 	return (0);
 }
 
-double drawray(int x0, int y0, int x1, int y1, t_vars *vars)
+double drawray(double x0, double y0, double x1, double y1, t_vars *vars)
 {
-  int dx =  abs (x1 - x0), sx = x0 < x1 ? 1 : -1;
-  int dy = -abs (y1 - y0), sy = y0 < y1 ? 1 : -1; 
-  int err = dx + dy, e2; /* error value e_xy */
-  int	count = 0;
-  double distance;
+  	double dx =  fabs (x1 - x0), sx = x0 < x1 ? 1 : -1;
+  	double dy = -fabs (y1 - y0), sy = y0 < y1 ? 1 : -1; 
+  	double err = dx + dy, e2; /* error value e_xy */
+  	int	count = 0;
+  	double distance;
+	double nx = x0;
+	double ny = y0;
 
 	int index;
 	index = ft_retindex(x0, y0, vars->data->mapX);
-  while (vars->pars->map[index] != '1'){  /* loop */
-    my_mlx_pixel_put(vars, x0, y0, 0xFF0000);
-    if (x0 == x1 && y0 == y1) break;
-    e2 = 2 * err;
-    if (e2 >= dy) { err += dy; x0 += sx; } /* e_xy+e_x > 0 */
-    if (e2 <= dx) { err += dx; y0 += sy; } /* e_xy+e_y < 0 */
-	index = ft_retindex(x0, y0, vars->data->mapX);
-  }
-	distance = sqrt((vars->data->px-x0)*(vars->data->px-x0) + (vars->data->py-y0)*(vars->data->py-y0));
-	//printf("distance : %f, angle : %f\n", (sin(vars->data->angle_min)), vars->data->angle_min);
-	return (distance / PI);
+	while (vars->pars->map[index] != '1'){  /* loop */
+    	my_mlx_pixel_put(vars, x0, y0, 0xFF0000);
+    	if (x0 == x1 && y0 == y1) break;
+    	e2 = 2 * err;
+    	if (e2 >= dy) { err += dy; x0 += sx; } /* e_xy+e_x > 0 */
+    	if (e2 <= dx) { err += dx; y0 += sy; } /* e_xy+e_y < 0 */
+		index = ft_retindex(x0, y0, vars->data->mapX);
+	}
+	distance = sqrt((vars->data->px-x0+dx)*(vars->data->px-x0+dx) + (vars->data->py-y0+dy)*(vars->data->py-y0+dy));
+	// printf("decimal : %f\n", (distance - count)*1000);
+	// printf("distance : %f\n", distance);
+	return (distance);
 }
 
-void	RayCaster(double distance, t_vars *vars) //mettre technique clsaad pour sky floor et wall
+void	RayCaster(double distance, t_vars *vars)
 {
-	int pixel_len = ceil((vars->data->map_height/2)/distance) * SIZE;
+	// distance += ((distance - (int)distance) * 10);
+	size_t pixel_len = ceil((vars->data->map_height/2)/distance) * SIZE;
+	int loop_pixel = vars->data->map_width;
+	//int pixel_len = ceil(((vars->data->map_height/2)/distance) * SIZE);
+	int mid_pix_len = pixel_len / 2;
+	int i = 0;
+	int sky = ((vars->data->map_height - pixel_len) / 2) + 1;
+	int floor = sky;
+	// if (colortab >= 4)
+	// 	colortab = 0;
+	// ft_putbackground2(&vars->cub, color[0]);
+	// printf("pixel_len : %d\n", pixel_len);
+	vars->data->cx = vars->data->map_height/2;
+	while (mid_pix_len-- && vars->data->cx >= 0)
+	{
+		my_mlx_pixel_put2(vars, vars->data->cy, vars->data->cx--, 0xFF0000);
+	}
+	while (sky-- && vars->data->cx >= 0)
+		my_mlx_pixel_put2(vars, vars->data->cy, vars->data->cx--, 0x0097FF); // sky
+	my_mlx_pixel_put2(vars, vars->data->cy, 0, 0x0097FF);
+	mid_pix_len = pixel_len / 2;
+	vars->data->cx = vars->data->map_height/2;
+	while (mid_pix_len-- && vars->data->cx <= vars->data->map_height)
+	{
+		my_mlx_pixel_put2(vars, vars->data->cy, vars->data->cx++, 0xFF0000);
+	}
+	while (floor-- && vars->data->cx <= vars->data->map_height)
+		my_mlx_pixel_put2(vars, vars->data->cy, vars->data->cx++, 0xFFFFF); // floor
+	vars->data->cy--;
+	if (vars->data->cy <= 0)
+		vars->data->cy = vars->data->map_width;
+	// if (cy >= MAP_WIDTH)
+	// 	cy = 0;
+
+	// mlx_put_image_to_window(vars->mlx, vars->cub.win, vars->cub.img, 0, 0);
+}
+void	RayCaster2(double distance, t_vars *vars) //mettre technique clsaad pour sky floor et wall
+{
+	distance += ((distance - (int)distance) * 10);
+	size_t pixel_len = ceil((vars->data->map_height/2)/distance) * SIZE;
+	// pixel_len = (size_t)(vars->data->map_height / distance) * SIZE;
+	// printf("pixellen : %zu\n", pixel_len);
+	// printf("distance : %f\n", distance);
+	// printf("distance : %f\n", ((distance - (int)distance) * 10));
 	int nbpx = pixel_len / 64;
 	static int j = 0;
 	int i = 0;
@@ -145,7 +191,7 @@ void	RayCaster(double distance, t_vars *vars) //mettre technique clsaad pour sky
 		//printf("cy : %d\n", vars->data->cy);
 		while(pixel_len && i < nbpx && vars->data->cy <= vars->data->map_height)
 		{
-			my_mlx_pixel_put2(vars, vars->data->cx, vars->data->cy++, *(unsigned int*)get_pixel(vars->txt, vars->data->imgx, vars->data->imgy));
+			my_mlx_pixel_put2(vars, vars->data->cx, vars->data->cy++, *(unsigned int*)get_pixel(vars->txtn, vars->data->imgx, vars->data->imgy));
 			i++;
 			pixel_len--;
 		}
@@ -260,7 +306,8 @@ void	drawlinetowall(t_vars *vars) // changer pdx et pdy pour s'arreter a un mur.
 	int i = 0;
 	while (i < vars->data->map_width)
 	{
-		RayCaster(drawray(vars->data->px, vars->data->py, vars->data->px + vars->data->rdx * 50000, vars->data->py + vars->data->rdy * 50000, vars), vars);
+		RayCaster(drawray(vars->data->px, vars->data->py, vars->data->px + vars->data->rdx, vars->data->py + vars->data->rdy, vars), vars);
+		// printf("%f\n", vars->data->py + vars->data->rdy);
 		vars->data->angle_min -= inc;
 		if (vars->data->angle_min < 0)
 			vars->data->angle_min = 2*PI + vars->data->angle_min;
@@ -348,7 +395,7 @@ void		putsquareWall(t_vars *vars, int x, int y)
 	int		tmpx;
 	int		tmpy;
 	static int count = 0;
-	printf("WALL count : %d\n", count++);
+	// printf("WALL count : %d\n", count++);
 	x *= 	SIZE;
 	y *= 	SIZE;
 	tmpx = x;
@@ -377,7 +424,7 @@ void		putsquareVoid(t_vars *vars, int x, int y)
 	x *= 	SIZE;
 	y *= 	SIZE;
 	static int count = 0;
-	printf("VOIDcount : %d\n", count++);
+	// printf("VOIDcount : %d\n", count++);
 	tmpx = x;
 	tmpy = y;
 	while (x++ <= tmpx + SIZE && x < vars->data->minimap_height)
@@ -501,7 +548,7 @@ int             main(int arc, char **arv)
 	vars->cub = wrmalloc(sizeof(t_cub));
 	vars->data = wrmalloc(sizeof(t_data));
 	vars->pars = wrmalloc(sizeof(t_struct));
-	vars->txt = wrmalloc(sizeof(t_img));
+	vars->txtn = wrmalloc(sizeof(t_img));
 
 	// if (mapX >= mapY)
 	// 	SIZE = MINIMAP_HEIGHT / mapX;
@@ -514,9 +561,9 @@ int             main(int arc, char **arv)
 	}
 	// printf("vars->pars->map : |%s|\n", vars->pars->map);
 	// return (0);
-	vars->txt->relative_path = vars->pars->pathtoNO;
-	vars->txt->img_width = 64;
-	vars->txt->img_width = 64;
+	vars->txtn->relative_path = vars->pars->pathtoNO;
+	vars->txtn->img_width = 64;
+	vars->txtn->img_width = 64;
 	int     img_width = 64;
 	int     img_height = 64;
 
@@ -577,13 +624,13 @@ int             main(int arc, char **arv)
 
 	int i = 0;
 	int j = 0;
-	printf("\n\npath : %s\n\n", vars->txt->relative_path);
-	if (!(vars->txt->img = mlx_png_file_to_image(vars->mlx, vars->txt->relative_path, &img_width, &img_height)))
+	printf("\n\npath : %s\n\n", vars->txtn->relative_path);
+	if (!(vars->txtn->img = mlx_png_file_to_image(vars->mlx, vars->txtn->relative_path, &img_width, &img_height)))
 	{
 		printf("Error, img not found");
 		return (0);
 	}
-	vars->txt->addr = mlx_get_data_addr(vars->txt->img, &vars->txt->bits_per_pixel, &vars->txt->line_length, &vars->txt->endian);
+	vars->txtn->addr = mlx_get_data_addr(vars->txtn->img, &vars->txtn->bits_per_pixel, &vars->txtn->line_length, &vars->txtn->endian);
 	/*
 	while (i < 64)
 	{
